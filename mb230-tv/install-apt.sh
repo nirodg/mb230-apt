@@ -55,12 +55,33 @@ done
 
 cat > "$PREFIX/activate.sh" <<'ACT'
 #!/bin/sh
-export PATH="/mtd_rwarea/opt/apt/bin:$PATH"
-echo "APT/dpkg environment activated: /mtd_rwarea/opt/apt/bin"
+case ":$PATH:" in
+  *:/mtd_rwarea/opt/apt/bin:*|/mtd_rwarea/opt/apt/bin:*|*: /mtd_rwarea/opt/apt/bin:*) ;;
+  *) export PATH="/mtd_rwarea/opt/apt/bin:$PATH" ;;
+esac
 ACT
 chmod +x "$PREFIX/activate.sh"
 
-echo "[*] Installed."
+# Best-effort persistent PATH setup (writable locations)
+add_path_snippet() {
+  target="$1"
+  [ -z "$target" ] && return 0
+  dir="$(dirname "$target")"
+  [ -d "$dir" ] || return 0
+  touch "$target" 2>/dev/null || return 0
+  if ! grep -q '/mtd_rwarea/opt/apt/bin' "$target" 2>/dev/null; then
+    printf '\n# mb230-apt\n[ -f /mtd_rwarea/opt/apt/activate.sh ] && . /mtd_rwarea/opt/apt/activate.sh\n' >> "$target" 2>/dev/null || true
+  fi
+}
+add_path_snippet /conf/profile
+add_path_snippet /conf/.profile
+add_path_snippet /mtd_rwarea/.profile
+
+# Apply to current shell when installer is sourced? (when executed, parent shell unaffected)
+. "$PREFIX/activate.sh" 2>/dev/null || true
+
+echo "[*] Installed to $PREFIX"
 echo "    $PREFIX/bin/apt-get --version"
 echo "    $PREFIX/bin/dpkg --version"
-echo "[*] Add to PATH: export PATH=\"$PREFIX/bin:\$PATH\" (or: . $PREFIX/activate.sh)"
+echo "[*] PATH: added best-effort init to /conf/profile (if writable)."
+echo "    For current shell run: export PATH=\"$PREFIX/bin:\$PATH\"  (or: . $PREFIX/activate.sh)"

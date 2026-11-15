@@ -13,20 +13,25 @@ chmod +x install-apt.sh
 sh install-apt.sh
 ```
 
-Installs to `/mtd_rwarea/opt/apt` by default (persistent writable storage). Override with `PREFIX=/some/path sh install-apt.sh`.
-
-## Usage
+One-liner bootstrap:
 
 ```sh
-export PATH=/mtd_rwarea/opt/apt/bin:$PATH
-# or: . /mtd_rwarea/opt/apt/activate.sh
+wget -O- https://raw.githubusercontent.com/nirodg/mb230-apt/main/mb230-tv/bootstrap-install.sh | sh
+```
 
+Installs to `/mtd_rwarea/opt/apt` by default (persistent writable storage). Override with `PREFIX=/some/path sh install-apt.sh`.
+
+## PATH / usage
+
+- The installer attempts to add `/mtd_rwarea/opt/apt/bin` to `PATH` persistently via writable profile files (e.g. `/conf/profile`, `/conf/.profile`, `/mtd_rwarea/.profile`) when available.
+- For the current shell/session, run: `export PATH=/mtd_rwarea/opt/apt/bin:$PATH` or `. /mtd_rwarea/opt/apt/activate.sh`
+- Direct execution works: `/mtd_rwarea/opt/apt/bin/apt-get --version`
+
+```sh
 apt-get --version
 dpkg --version
 apt-get update
 ```
-
-Direct execution works (`/mtd_rwarea/opt/apt/bin/apt-get ...`) via bundled wrappers/libs.
 
 ## Defaults included
 

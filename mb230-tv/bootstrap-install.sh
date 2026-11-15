@@ -10,4 +10,4 @@ wget -O install-apt.sh "$BASE/install-apt.sh"
 chmod +x install-apt.sh
 echo "[*] Running installer..."
 sh install-apt.sh
-echo "[*] Done. Try: /mtd_rwarea/opt/apt/bin/apt-get --version"
+echo "[*] Done. Open a new shell or run: export PATH=/mtd_rwarea/opt/apt/bin:\$PATH"
